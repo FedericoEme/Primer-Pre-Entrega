@@ -1,17 +1,123 @@
+//Arreglo de elementos que serán usados en el carrito
+let productos = [
+    { id: 1, nombre: "remera adventure", categoria: "indumentaria", stock: 10, precio: 5000 },
+    { id: 2, nombre: "remera logo proyecto", categoria: "indumentaria", stock: 7, precio: 5000 },
+    { id: 3, nombre: "buzo adventure", categoria: "indumentaria", stock: 14, precio: 9000 },
+    { id: 4, nombre: "buzo logo proyecto", categoria: "indumentaria", stock: 11, precio: 9000 },
+    { id: 5, nombre: "gorra logo", categoria: "indumentaria", stock: 20, precio: 3500 },
+    { id: 6, nombre: "control velocidad crucero", categoria: "accesorios", stock: 10, precio: 2500 },
+    { id: 7, nombre: "soporte mando de drone", categoria: "accesorios", stock: 7, precio: 4000 },
+    { id: 8, nombre: "soporte celular", categoria: "accesorios", stock: 3, precio: 6000 },
+    { id: 9, nombre: "calco adventure", categoria: "marchandising", stock: 100, precio: 200 },
+    { id: 10, nombre: "calco proyecto", categoria: "marchandising", stock: 200, precio: 200 },
+]
+
+
 //Simulo que el usuario y la contraseña viene de una Base de Datos
 let usuarioBD = "Fede"
 let contraseniaBD = "Fede123"
-let item = -1
-let precioRemeras = 5000
-let precioPantalones = 15000
-let precioBuzos = 10000
-let totalCompra = 0
-let totalRemeras = 0
-let totalPantalones = 0
-let totalBuzos = 0
-let cantidadRemeras = 0
-let cantidadPantalones = 0
-let cantidadBuzos = 0
+//Función que genera el carrito de compras
+login(usuarioBD, contraseniaBD)
+main(productos)
+
+function main(productos) {
+    let carrito = []
+    let cat
+    let opcion
+    do {
+        opcion = Number(prompt("Ingrese opción:\n1 - Listado de productos\n2 - Agregar producto al carrito\n3 - Filtrar por categoria\n4 - Ordenar por precio asc\n5 - Ordenar por precio desc\n6 - Finalizar compra\n0 - Para salir"))
+        switch (opcion) {
+            case 1:
+                alert(listar(productos, "id", "nombre", "precio"))
+                break
+            case 2:
+                agregarAlCarrito(productos, carrito)
+                break
+            case 3:
+                cat = prompt("Ingrese la categoría deseada: \nIndumentaria\nAccesorios\nMarchandising").toLowerCase()
+                let categoriaProducto = productos.filter(producto => producto.categoria === cat)
+                if (categoriaProducto){
+                alert(listar(categoriaProducto,"id", "nombre", "precio"))
+                } else{
+                    alert ("La categoría ingresada es incorrecta")
+                }
+                break
+
+            case 4:
+                ordenar(productos, "precio", true)  
+                alert(listar(productos,"id",  "nombre", "precio"))
+                break
+            case 5:
+                ordenar(productos, "precio", false)  
+                alert(listar(productos, "id", "nombre", "precio"))
+                break
+            case 6:
+                finalizarCompra(carrito)
+                carrito = []
+                break
+            default:
+                break
+        }
+    } while (opcion != 0)
+}
+
+//Función para ordenar por precio Ascedente o descendente
+function ordenar(productos, propiedad, esAscendente) {
+    productos.sort((a, b) => {
+      if (a[propiedad] < b[propiedad]) {
+        return -1
+      }
+      if (a[propiedad] > b[propiedad]) {
+        return 1
+      }
+      return 0
+    })
+    if (!esAscendente) {
+      productos.reverse()
+    }
+  }
+//Función para finalizar la compra
+function finalizarCompra(carrito) {
+    if (carrito.length === 0) {
+        alert("Primero debe agregar productos al carrito")
+    } else {
+        let total = carrito.reduce((acum, producto) => acum + producto.subtotal, 0)
+        alert("El total a pagar es " + total)
+        alert("Gracias por su compra")
+    }
+}
+
+
+function listar(productos, prop1, prop2, prop3) {
+    return productos.map(producto => producto[prop1] + " - " + producto[prop2] + " - " + producto[prop3]).join("\n")
+  }
+
+//Esta función agrega productos al carrito. Cuando se agrega un producto bajo el stock del mismo
+function agregarAlCarrito(productos, carrito) {
+    let id = Number(prompt("Seleccione producto por id:\n" + listar(productos, "id", "nombre", "precio")))
+    let productoBuscado = productos.find(producto => producto.id === id)
+    let productoEnCarrito = carrito.find(producto => producto.id === productoBuscado.id)
+    let cantidad = Number(prompt("Ingrese la cantidad de unidades a comprar"))
+    let nombre
+    if (productoBuscado.stock > cantidad) {
+        if (productoEnCarrito) {
+            productoEnCarrito.unidades = productoEnCarrito.unidades + cantidad
+            productoEnCarrito.subtotal = productoEnCarrito.unidades * productoEnCarrito.precioUnitario
+        } else {
+            carrito.push({
+                id: productoBuscado.id,
+                nombre: productoBuscado.nombre,
+                precioUnitario: productoBuscado.precio,
+                unidades: cantidad,
+                subtotal: productoBuscado.precio * cantidad
+            })
+        }
+        productoBuscado.stock = productoBuscado.stock - cantidad
+        alert("Se agregaron " + cantidad + " unidades de " + productoBuscado.nombre + " al carrito")
+    } else {
+        alert("No hay suficiente stock del producto seleccionado")
+    }
+}
 
 //Función que valida el logueo del usuario --> Se le pasa el usuario y contraseñas correcto y devuelve si se consiguió el logueo o no
 function login(usuarioBD, contraseniaBD) {
@@ -39,115 +145,3 @@ function login(usuarioBD, contraseniaBD) {
     }
     return (inicioCorrecto)
 }
-
-//Función que genera el carrito de compras
-function comprar() {
-    let opcionIngresada = prompt("Ingrese: \n1 para comprar Remeras \n2 para comprar Pantalones  \n3 para comprar Buzos \n4 Para ir a pagar la compra\n0 Para cancelar compra y salir")
-
-    switch (opcionIngresada) {
-        case "1":
-            item = 1
-            cantidadRemeras = prompt("Ingrese la cantidad de Remeras a comprar")
-            alert ("Usted agregó " + cantidadRemeras + " remeras a su carrito")
-            break
-        case "2":
-            item = 2
-            cantidadPantalones = prompt("Ingrese la cantidad de Pantalones a comprar")
-            alert ("Usted agregó " + cantidadPantalones + " pantalones a su carrito")
-            break
-        case "3":
-            item = 3
-            cantidadBuzos = prompt("Ingrese la cantidad de Buzos a comprar")
-            alert ("Usted agregó " + cantidadBuzos + " buzos a su carrito")
-            break
-        case "4":
-            item = 4
-            alert("Avanzar a la sección de pago")
-            break
-        case "0":
-            alert("Terminó la compra")
-            item = 0
-            break
-        default:
-            alert("Ingresaste una opción NO VALIDA")
-            break
-    }
-
-}
-
-//Función pago
-function pago(total) {
-    let option = prompt ("Ingrese: \n1 Para pagar en efectivo (10% de descuento) \n2 Para pagar con tarjeta de crédito (10% de Recargo) \n3 Para pagar con tarjeta de débito \n0 Para cancelar compra y salir")
-    let totalPago = 0
-    let impote = 0
-    switch (option) {
-        case "1":
-            totalPago = totalCompra * 0.9
-            importe = totalPago.toFixed(2)
-            break;
-        case "2":
-            totalPago = totalCompra * 1.1
-            importe = totalPago.toFixed(2)
-            break;
-        case "3":
-            totalPago = totalCompra
-            importe = totalPago.toFixed(2)
-            break;
-        case "0":
-            totalPago = -1
-            break;
-
-        default:
-            alert ("Ingresó una opción NO VALIDA")
-            break;
-    }
-    return (importe)
-}
-
-
-
-
-let inicio = login(usuarioBD, contraseniaBD)
-if (inicio = true){ 
-    let cantTotRem = 0
-    let cantTotPant = 0
-    let cantTotBuz = 0
-    do {
-        comprar()
-        console.log(item)
-        if (item == 1 ) {
-            cantTotRem += cantidadRemeras
-            totalRemeras = cantTotRem * precioRemeras
-            console.log (totalRemeras)
-            
-        } else if (item == 2){
-            cantTotPant += cantidadPantalones
-            totalPantalones = cantTotPant * precioPantalones
-            console.log (totalPantalones)
-        }else if (item == 3) {
-            cantTotBuz += cantidadBuzos
-            totalBuzos = cantTotBuz * precioBuzos
-            console.log (totalBuzos)
-        }
-        else if (item == 4){
-            totalCompra = parseFloat(totalRemeras + totalPantalones + totalBuzos)
-            alert ("El monto total de la compra es de $" + totalCompra )
-            let compraTotal = pago(totalCompra) 
-            if (compraTotal > 0) {
-            alert ("El monto total a pagar es " + compraTotal + " pesos")
-            alert ("Gracias por su compra")
-            item = 0
-            }else{
-            alert ("Canceló la compra")  
-            item = 0 
-            }
-        }
-
-    } while (item != 0);
-
-
-} 
-
-
-
-

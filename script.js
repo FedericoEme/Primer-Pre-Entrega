@@ -15,11 +15,12 @@ let carrito = carritoRecuperado ? JSON.parse(carritoRecuperado) : []
 renderizarCarrito(carrito)
 renderizarProductos(productos, carrito)
 
+//Capturo el botón Buscar y filtro por categoría buscada
 let buscador = document.getElementById("buscador")
-
 let botonBuscar = document.getElementById("buscar")
 botonBuscar.addEventListener("click", () => filtrarYRenderizar(productos))
 
+//Filtros por categoría
 let botonesCategorias = document.getElementsByClassName("filtroCategoria")
 for (const botonCategoria of botonesCategorias) {
   botonCategoria.addEventListener("click", (e) => filtrarPorCategoria(e, productos))
@@ -60,6 +61,7 @@ function renderizarProductos(productos, carrito) {
         <button id=${id}>Agregar al carrito</button>
       </div>
     `
+    //cuando paso el mouse por la tarjeta muestra Info Extra y el botón para agregar al carrito
     tarjeta.addEventListener("mouseenter", (e) => mostrarInfoExtra(e))
     tarjeta.addEventListener("mouseleave", (e) => mostrarInfoExtra(e))
     contenedor.appendChild(tarjeta)
@@ -134,6 +136,7 @@ function finalizarCompra() {
 let botonVerOcultar = document.getElementById("verOcultar")
 botonVerOcultar.addEventListener("click", verOcultarCarrito)
 
+//Esta función es la que pasa a mostrarme el carrito, captura el botón verOcultar
 function verOcultarCarrito() {
   let carrito = document.getElementById("carrito")
   let contenedorProductos = document.getElementById("contenedorProductos")

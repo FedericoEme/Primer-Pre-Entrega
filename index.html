@@ -1,11 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-    <script src="./script.js"></script>
+  <header>
+    <img class= "logoPagina" src="./images/logoSoyTribu.png" alt="">
+    <hr>
+  </header>
+  <main>
+    <div class="oculta" id="carrito">
+      <p>No hay productos en el carrito</p>
+    </div>
+    <input id="buscador" placeholder="Nombre producto">
+    <button id="buscar">BUSCAR</button>
+    <button class="filtroCategoria" id="marchandising">Marchandasing</button>
+    <button class="filtroCategoria" id="indumentaria">Indumentaria</button>
+    <button id="verOcultar">VER CARRITO</button>
+    <div id="contenedorProductos"></div>
+  </main>
+  
+  <footer>
+    <hr>
+    <p>Creado por FLM</p>
+  </footer>
+  <script src="./script.js"></script>
 </body>
 </html>

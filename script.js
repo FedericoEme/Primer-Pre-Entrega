@@ -1,147 +1,144 @@
-//Arreglo de elementos que serán usados en el carrito
 let productos = [
-    { id: 1, nombre: "remera adventure", categoria: "indumentaria", stock: 10, precio: 5000 },
-    { id: 2, nombre: "remera logo proyecto", categoria: "indumentaria", stock: 7, precio: 5000 },
-    { id: 3, nombre: "buzo adventure", categoria: "indumentaria", stock: 14, precio: 9000 },
-    { id: 4, nombre: "buzo logo proyecto", categoria: "indumentaria", stock: 11, precio: 9000 },
-    { id: 5, nombre: "gorra logo", categoria: "indumentaria", stock: 20, precio: 3500 },
-    { id: 6, nombre: "control velocidad crucero", categoria: "accesorios", stock: 10, precio: 2500 },
-    { id: 7, nombre: "soporte mando de drone", categoria: "accesorios", stock: 7, precio: 4000 },
-    { id: 8, nombre: "soporte celular", categoria: "accesorios", stock: 3, precio: 6000 },
-    { id: 9, nombre: "calco adventure", categoria: "marchandising", stock: 100, precio: 200 },
-    { id: 10, nombre: "calco proyecto", categoria: "marchandising", stock: 200, precio: 200 },
+    { id: 1, nombre: "Remera Adventure", categoria: "indumentaria", stock: 10, precio: 5000, rutaImagen: "remeraAdventure.webp", info: "Remera de algodón con con estampa en la espalda" },
+    { id: 2, nombre: "Remera Logo", categoria: "indumentaria", stock: 7, precio: 5000, rutaImagen: "remeraLogo.webp", info: "Remera de algodón con logo en el pecho" },
+    { id: 3, nombre: "Buzo Adventure", categoria: "indumentaria", stock: 14, precio: 9000, rutaImagen: "buzoAdventure.webp", info: "Buzo con capucha con logo Adventure en la espalda" },
+    { id: 4, nombre: "Buzo Logo", categoria: "indumentaria", stock: 11, precio: 9000, rutaImagen: "buzoLogo.webp",info: "Buzo con capucha con logo de Soy Tribu en el pecho" },
+    { id: 5, nombre: "Gorra Logo", categoria: "indumentaria", stock: 20, precio: 3500, rutaImagen: "gorraProyecto.webp",info: "Gorra con logo del proyecto" },
+    { id: 6, nombre: "Piluso Logo", categoria: "indumentaria", stock: 10, precio: 2500, rutaImagen: "pilusoLogo.webp",info: "Piluso con logo del proyecto"  },
+    { id: 7, nombre: "Taza Logo", categoria: "marchandising", stock: 7, precio: 3000, rutaImagen: "tazaLogo.webp" ,info: "Taza Soy Tribu"  },
+    { id: 8, nombre: "Calco Logo", categoria: "marchandising", stock: 100, precio: 200, rutaImagen: "calcoLogo.webp",info: "Calco de Soy Tribu"  },
 ]
+  
+let carritoRecuperado = localStorage.getItem("carrito")
+let carrito = carritoRecuperado ? JSON.parse(carritoRecuperado) : []
 
+renderizarCarrito(carrito)
+renderizarProductos(productos, carrito)
 
-//Simulo que el usuario y la contraseña viene de una Base de Datos
-let usuarioBD = "Fede"
-let contraseniaBD = "Fede123"
-//Función que genera el carrito de compras
-login(usuarioBD, contraseniaBD)
-main(productos)
+let buscador = document.getElementById("buscador")
 
-function main(productos) {
-    let carrito = []
-    let cat
-    let opcion
-    do {
-        opcion = Number(prompt("Ingrese opción:\n1 - Listado de productos\n2 - Agregar producto al carrito\n3 - Filtrar por categoria\n4 - Ordenar por precio asc\n5 - Ordenar por precio desc\n6 - Finalizar compra\n0 - Para salir"))
-        switch (opcion) {
-            case 1:
-                alert(listar(productos, "id", "nombre", "precio"))
-                break
-            case 2:
-                agregarAlCarrito(productos, carrito)
-                break
-            case 3:
-                cat = prompt("Ingrese la categoría deseada: \nIndumentaria\nAccesorios\nMarchandising").toLowerCase()
-                let categoriaProducto = productos.filter(producto => producto.categoria === cat)
-                if (categoriaProducto){
-                alert(listar(categoriaProducto,"id", "nombre", "precio"))
-                } else{
-                    alert ("La categoría ingresada es incorrecta")
-                }
-                break
+let botonBuscar = document.getElementById("buscar")
+botonBuscar.addEventListener("click", () => filtrarYRenderizar(productos))
 
-            case 4:
-                ordenar(productos, "precio", true)  
-                alert(listar(productos,"id",  "nombre", "precio"))
-                break
-            case 5:
-                ordenar(productos, "precio", false)  
-                alert(listar(productos, "id", "nombre", "precio"))
-                break
-            case 6:
-                finalizarCompra(carrito)
-                carrito = []
-                break
-            default:
-                break
-        }
-    } while (opcion != 0)
+let botonesCategorias = document.getElementsByClassName("filtroCategoria")
+for (const botonCategoria of botonesCategorias) {
+  botonCategoria.addEventListener("click", (e) => filtrarPorCategoria(e, productos))
 }
 
-//Función para ordenar por precio Ascedente o descendente
-function ordenar(productos, propiedad, esAscendente) {
-    productos.sort((a, b) => {
-      if (a[propiedad] < b[propiedad]) {
-        return -1
-      }
-      if (a[propiedad] > b[propiedad]) {
-        return 1
-      }
-      return 0
+function filtrarPorCategoria(e, productos) {
+  console.log(e)
+  let productosFiltrados = productos.filter(producto => {
+    return producto.categoria === e.target.id
+  })
+  renderizarProductos(productosFiltrados)
+}
+
+function filtrarYRenderizar(productos) {
+  let productosFiltrados = productos.filter(producto => {
+    return producto.nombre.includes(buscador.value)
+  })
+  renderizarProductos(productosFiltrados)
+}
+
+function renderizarProductos(productos, carrito) {
+  let contenedor = document.getElementById("contenedorProductos")
+  contenedor.innerHTML = ""
+
+  productos.forEach(({ nombre, rutaImagen, precio, id, info }) => {
+    let tarjeta = document.createElement("div")
+    tarjeta.className = "tarjeta"
+    tarjeta.id = "tarjeta" + id
+
+    tarjeta.innerHTML = `
+      <div>
+        <h3>${nombre}</h3>
+        <img class=imagenProducto src=./images/${rutaImagen} />
+        <p>$${precio}</p>
+      </div>
+      <div class=oculta>
+        <p>${info}</p>
+        <button id=${id}>Agregar al carrito</button>
+      </div>
+    `
+    tarjeta.addEventListener("mouseenter", (e) => mostrarInfoExtra(e))
+    tarjeta.addEventListener("mouseleave", (e) => mostrarInfoExtra(e))
+    contenedor.appendChild(tarjeta)
+
+    let botonAgregarAlCarrito = document.getElementById(id)
+    botonAgregarAlCarrito.addEventListener("click", (e) => agregarProductoAlCarrito(productos, carrito, e))
+  })
+}
+
+function mostrarInfoExtra(e) {
+  e.target.children[0].classList.toggle("oculta")
+  e.target.children[1].classList.toggle("oculta")
+}
+
+function agregarProductoAlCarrito(productos, carrito, e) {
+  let productoBuscado = productos.find(producto => producto.id === Number(e.target.id))
+  let productoEnCarrito = carrito.find(producto => producto.id === productoBuscado.id)
+
+  if (productoBuscado.stock > 0) {
+    if (productoEnCarrito) {
+      productoEnCarrito.unidades++
+      productoEnCarrito.subtotal = productoEnCarrito.unidades * productoEnCarrito.precioUnitario
+    } else {
+      carrito.push({
+        id: productoBuscado.id,
+        nombre: productoBuscado.nombre,
+        precioUnitario: productoBuscado.precio,
+        unidades: 1,
+        subtotal: productoBuscado.precio
+      })
+    }
+    productoBuscado.stock--
+    localStorage.setItem("carrito", JSON.stringify(carrito))
+  } else {
+    alert("No hay más stock del producto seleccionado")
+  }
+
+  renderizarCarrito(carrito)
+}
+
+function renderizarCarrito(productosEnCarrito) {
+  if (productosEnCarrito.length > 0) {
+    let divCarrito = document.getElementById("carrito")
+    divCarrito.innerHTML = ""
+
+    productosEnCarrito.forEach(({ nombre, precioUnitario, unidades, subtotal }) => {
+      let tarjProdCarrito = document.createElement("div")
+      tarjProdCarrito.className = "tarjProdCarrito"
+      tarjProdCarrito.innerHTML = `
+        <p>${nombre}</p>
+        <p>$${precioUnitario}</p>
+        <p>${unidades}</p>
+        <p>$${subtotal}</p>
+      `
+
+      divCarrito.appendChild(tarjProdCarrito)
     })
-    if (!esAscendente) {
-      productos.reverse()
-    }
+
+    let boton = document.createElement("button")
+    boton.innerHTML = "Finalizar compra"
+    boton.addEventListener("click", finalizarCompra)
+    divCarrito.appendChild(boton)
   }
-//Función para finalizar la compra
-function finalizarCompra(carrito) {
-    if (carrito.length === 0) {
-        alert("Primero debe agregar productos al carrito")
-    } else {
-        let total = carrito.reduce((acum, producto) => acum + producto.subtotal, 0)
-        alert("El total a pagar es " + total)
-        alert("Gracias por su compra")
-    }
 }
 
-
-function listar(productos, prop1, prop2, prop3) {
-    return productos.map(producto => producto[prop1] + " - " + producto[prop2] + " - " + producto[prop3]).join("\n")
-  }
-
-//Esta función agrega productos al carrito. Cuando se agrega un producto bajo el stock del mismo
-function agregarAlCarrito(productos, carrito) {
-    let id = Number(prompt("Seleccione producto por id:\n" + listar(productos, "id", "nombre", "precio")))
-    let productoBuscado = productos.find(producto => producto.id === id)
-    let productoEnCarrito = carrito.find(producto => producto.id === productoBuscado.id)
-    let cantidad = Number(prompt("Ingrese la cantidad de unidades a comprar"))
-    let nombre
-    if (productoBuscado.stock > cantidad) {
-        if (productoEnCarrito) {
-            productoEnCarrito.unidades = productoEnCarrito.unidades + cantidad
-            productoEnCarrito.subtotal = productoEnCarrito.unidades * productoEnCarrito.precioUnitario
-        } else {
-            carrito.push({
-                id: productoBuscado.id,
-                nombre: productoBuscado.nombre,
-                precioUnitario: productoBuscado.precio,
-                unidades: cantidad,
-                subtotal: productoBuscado.precio * cantidad
-            })
-        }
-        productoBuscado.stock = productoBuscado.stock - cantidad
-        alert("Se agregaron " + cantidad + " unidades de " + productoBuscado.nombre + " al carrito")
-    } else {
-        alert("No hay suficiente stock del producto seleccionado")
-    }
+function finalizarCompra() {
+  let carrito = document.getElementById("carrito")
+  carrito.innerHTML = ""
+  localStorage.removeItem("carrito")
 }
 
-//Función que valida el logueo del usuario --> Se le pasa el usuario y contraseñas correcto y devuelve si se consiguió el logueo o no
-function login(usuarioBD, contraseniaBD) {
-    let usuario
-    let contrasenia
-    let contador = 0
-    let inicioCorrecto = false
+let botonVerOcultar = document.getElementById("verOcultar")
+botonVerOcultar.addEventListener("click", verOcultarCarrito)
 
-    do {
-        usuario = prompt("Ingrese usuario")
-        contrasenia = prompt("Ingrese contraseña")
-        contador++
+function verOcultarCarrito() {
+  let carrito = document.getElementById("carrito")
+  let contenedorProductos = document.getElementById("contenedorProductos")
 
-        if (usuario === usuarioBD && contrasenia === contraseniaBD) {
-            alert("Bienvenido " + usuario)
-            inicioCorrecto = true
-            break
-        } else {
-            alert("Usuario y/o contraseña incorrecto/s")
-        }
-    } while (contador < 3)
-
-    if (contador === 3 && !inicioCorrecto) {
-        alert("Agotaste tus intentos, volvé más tarde")
-    }
-    return (inicioCorrecto)
+  carrito.classList.toggle("oculta")
+  contenedorProductos.classList.toggle("oculta")
 }
+
